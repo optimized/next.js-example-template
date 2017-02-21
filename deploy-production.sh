@@ -1,0 +1,2 @@
+#!/bin/bash
+NOW_DOMAIN=$PROD_DOMAIN NOW_TOKEN=$NOW_TOKEN ./deploy.sh
