@@ -5,7 +5,7 @@ if [ -n "$NOW_DOMAIN" ]
 then
 
   echo "Deploying "$NOW_DOMAIN
-  DEPLOY=$(now --token=$NOW_TOKEN -n $NOW_DOMAIN)
+  now --docker --token=$NOW_TOKEN -n $NOW_DOMAIN
   echo ""
 
 else
@@ -14,17 +14,7 @@ else
 
 fi
 
-#Find the ID
-if [ -n "$DEPLOY" ]
-then
-
-  CURRENTID=$(now --token=$NOW_TOKEN ls $NOW_DOMAIN | awk '/.*([A-Za-z0-9]{24}).*/ { print $1; }'| head -n 1 )
-else
-
-  echo "Deployment did not occur. Something is wrong."
-  exit
-
-fi
+CURRENTID=$(now --token=$NOW_TOKEN ls $NOW_DOMAIN | awk '/.*([A-Za-z0-9]{24}).*/ { print $1; }'| head -n 1 )
 
 # Alias the site and remove old aliases
 if [ -n "$CURRENTID" ]
@@ -46,11 +36,13 @@ then
       echo "$NOW_DOMAIN used to be aliased to $OLDALIAS, we should remove that."
       echo "Removing old aliases..."
       now --token=$NOW_TOKEN ls $NOW_DOMAIN | grep -v "$CURRENTID" | awk '/.*([A-Za-z0-9]{24}).*/ { print $1; }' | xargs -I{} now --token=$NOW_TOKEN -y rm {}
-
+      exit
     fi
   else
     echo "We can not find a current alias."
+    exit
   fi
 else
-  echo "We cannot find a current ID."
+  echo "We cannot find a current ID. Maybe "
+  exit
 fi
